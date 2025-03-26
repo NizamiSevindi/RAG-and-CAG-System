@@ -1,8 +1,8 @@
 import os
 import time
-from src.helper import load_pdf_file, text_split
-from langchain_chroma import Chroma
 from dotenv import load_dotenv
+from src.helper import load_and_split_pdf
+from langchain_chroma import Chroma
 from langchain.embeddings import AzureOpenAIEmbeddings
 from langchain_openai import AzureOpenAIEmbeddings
 
@@ -12,17 +12,16 @@ CHROMA_DB_PATH = "chroma_storage"
 os.makedirs(CHROMA_DB_PATH, exist_ok=True)
 
 embeddings = AzureOpenAIEmbeddings(
-        model="text-embedding-ada-002",
+        model=os.getenv("AZURE_OPENAI_DEPLOYMENT_NAME"),
         api_key=os.getenv("AZURE_OPENAI_API_KEY"),
         api_version=os.getenv("AZURE_OPENAI_API_VERSION"),
         azure_endpoint=os.getenv("AZURE_OPENAI_ENDPOINT")
     )
 
-extracted_data=load_pdf_file(data='Data/')
-text_chunks=text_split(extracted_data)
+text_chunks = load_and_split_pdf(data='Data/')
 
 BATCH_SIZE = 200 
-WAIT_TIME = 30 
+WAIT_TIME = 20 
 
 vector_db = Chroma(persist_directory=CHROMA_DB_PATH, embedding_function=embeddings)
 existing_docs = set(vector_db.get()["documents"]) if vector_db.get() else set()
