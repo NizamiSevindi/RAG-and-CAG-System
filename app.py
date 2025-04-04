@@ -73,9 +73,8 @@ def rag_chain_with_links(question):
         cached_meta = cached["metadatas"][0][0]
         source = cached_meta.get("source", "#")
         page = cached_meta.get("page", 1)
-
-        cached_answer = cached["documents"][0][0]
         print("🔁 Cache hit!")
+
         return {
             "answer":
             f"""
